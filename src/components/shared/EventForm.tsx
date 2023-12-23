@@ -9,10 +9,8 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -24,8 +22,12 @@ import FileUploader from "./FileUploader"
 import { useState } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker"
+import {useUploadThing} from "@/lib/uploadthing"
 
 import "react-datepicker/dist/react-datepicker.css";
+import { handleError } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { createEvent } from "@/lib/actions/event.actions"
 
 
 type EventFormProps = {
@@ -36,18 +38,44 @@ type EventFormProps = {
 export default function EventForm({ userId, type }: EventFormProps) {
 
     const [files, setFiles] = useState<File[]>([])
-
+    const { startUpload } = useUploadThing("imageUploader")
+    
+    const router = useRouter()
     const initalValues = eventDefaultValues
 
     const form = useForm<z.infer<typeof eventFormSchema>>({
         resolver: zodResolver(eventFormSchema),
         defaultValues: initalValues
     })
-
     
-    function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    async function onSubmit(values: z.infer<typeof eventFormSchema>) {
         
-        console.log(values)
+        let uploadImageUrl = values.imageUrl
+
+        if(files.length > 0) {
+            const uploadImages = await startUpload(files)
+            if(!uploadImages){
+                return
+            }
+            uploadImageUrl = uploadImages[0].url
+        }
+
+        if( type === "Create"){
+            try {
+                const newEvent = await createEvent({
+                    event:{...values, imageUrl: uploadImageUrl},
+                    userId,
+                    path:"/profile"
+                })
+
+                if(newEvent){
+                    form.reset()
+                    router.push(`/events/${newEvent._id}`)
+                }
+            } catch (error) {
+                handleError(error)
+            }
+        }
     }
 
     return (
@@ -226,11 +254,11 @@ export default function EventForm({ userId, type }: EventFormProps) {
                                                             >
                                                                 Free Ticket
                                                             </label>
-                                                            <Checkbox 
-                                                            onCheckedChange={field.onChange}
-                                                            checked={field.value}
-                                                            id="isFree" 
-                                                            className="mr-2 h-5 w-5 border-2 border-primary-500 " />
+                                                            <Checkbox
+                                                                onCheckedChange={field.onChange}
+                                                                checked={field.value}
+                                                                id="isFree"
+                                                                className="mr-2 h-5 w-5 border-2 border-primary-500 " />
                                                         </div>
                                                     </FormControl>
                                                     <FormMessage />
@@ -271,7 +299,7 @@ export default function EventForm({ userId, type }: EventFormProps) {
                     disabled={form.formState.isSubmitting}
                     className="button col-span-2 w-full"
                 >
-                    {form.formState.isSubmitting ? "Submitting" :`${type} Event`}
+                    {form.formState.isSubmitting ? "Submitting" : `${type} Event`}
                 </Button>
             </form>
         </Form>
