@@ -44,10 +44,9 @@ export default function EventForm({ userId, type }: EventFormProps) {
         defaultValues: initalValues
     })
 
-    // 2. Define a submit handler.
+    
     function onSubmit(values: z.infer<typeof eventFormSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
+        
         console.log(values)
     }
 
@@ -227,7 +226,11 @@ export default function EventForm({ userId, type }: EventFormProps) {
                                                             >
                                                                 Free Ticket
                                                             </label>
-                                                            <Checkbox id="isFree" className="mr-2 h-5 w-5 border-2 border-primary-500 " />
+                                                            <Checkbox 
+                                                            onCheckedChange={field.onChange}
+                                                            checked={field.value}
+                                                            id="isFree" 
+                                                            className="mr-2 h-5 w-5 border-2 border-primary-500 " />
                                                         </div>
                                                     </FormControl>
                                                     <FormMessage />
