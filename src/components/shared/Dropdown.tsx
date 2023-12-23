@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ICategory } from "@/lib/database/models/category.model"
-import { startTransition, useState } from "react"
+import { startTransition, useEffect, useState } from "react"
 
 import {
   AlertDialog,
@@ -20,6 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from "../ui/input"
+import { createCateogry, getAllCategorys } from "@/lib/actions/category.actions"
 
 
 type DropdownProps = {
@@ -29,12 +30,28 @@ type DropdownProps = {
 
 export default function Dropdown({ value, onChangeHandler }: DropdownProps) {
 
-  const [categorys, setCategorys] = useState<ICategory[]>([])
+  const [categories, setCategories] = useState<ICategory[]>([])
   const [newCategory, setNewCategory] = useState<string>("")
 
-  const handleAddCategory = ()=>{
-
+  const handleAddCategory = () => {
+    createCateogry({
+      categoryName: newCategory.trim()
+    })
+      .then((category) => {
+        setCategories((prevState) => [...prevState, category])
+      })
   }
+
+  useEffect(() => {
+
+    const getCategories = async () => {
+      const categoriesList = await getAllCategorys()
+      categoriesList && setCategories(categoriesList as ICategory[])
+    }
+
+    getCategories()
+  }, [])
+
 
   return (
     <Select onValueChange={onChangeHandler} defaultValue={value}>
@@ -43,7 +60,7 @@ export default function Dropdown({ value, onChangeHandler }: DropdownProps) {
       </SelectTrigger>
       <SelectContent>
         {
-          categorys.length > 0 && categorys.map((category) => (
+          categories.length > 0 && categories.map((category) => (
             <SelectItem key={category._id} value={category._id} className="select-item p-regular-14">
               {category.name}
             </SelectItem>
