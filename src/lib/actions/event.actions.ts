@@ -1,11 +1,12 @@
 "use server"
 
-import { CreateEventParams, GetAllEventsParams } from "@/types"
+import { CreateEventParams, DeleteEventParams, GetAllEventsParams } from "@/types"
 import { handleError } from "../utils"
 import { connectToDatabase } from "../database"
 import User from "../database/models/user.model"
 import Event from "../database/models/event.model"
 import Category from "../database/models/category.model"
+import { revalidatePath } from "next/cache"
 
 
 const populateEvent = async (query: any) => {
@@ -76,6 +77,20 @@ export const getAllEvents = async ({query, limit = 6, page}: GetAllEventsParams)
             data: JSON.parse(JSON.stringify(events)),
             totalPages: Math.ceil( eventsCount/limit)
         }
+
+    } catch (error) {
+        handleError(error)
+    }
+}
+
+export const deleteEvent = async ({eventId, path}: DeleteEventParams) => {
+    try {
+
+        await connectToDatabase()
+
+        const deletedEvent = await Event.findByIdAndDelete(eventId)
+
+        if(deletedEvent) revalidatePath(path)
 
     } catch (error) {
         handleError(error)
