@@ -22,55 +22,89 @@ import FileUploader from "./FileUploader"
 import { useState } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker"
-import {useUploadThing} from "@/lib/uploadthing"
+import { useUploadThing } from "@/lib/uploadthing"
 
 import "react-datepicker/dist/react-datepicker.css";
 import { handleError } from "@/lib/utils"
 import { useRouter } from "next/navigation"
-import { createEvent } from "@/lib/actions/event.actions"
+import { createEvent, updateEvent } from "@/lib/actions/event.actions"
+import { IEvent } from "@/lib/database/models/event.model"
 
 
 type EventFormProps = {
     userId: string,
-    type: "Create" | "Update"
+    type: "Create" | "Update",
+    event?: IEvent,
+    eventId?: string
 }
 
-export default function EventForm({ userId, type }: EventFormProps) {
+export default function EventForm({ userId, type, event, eventId }: EventFormProps) {
 
     const [files, setFiles] = useState<File[]>([])
     const { startUpload } = useUploadThing("imageUploader")
-    
+
     const router = useRouter()
-    const initalValues = eventDefaultValues
+    const initalValues = event && type === "Update" ? {
+        ...event,
+        startDateTime: new Date(event.startDateTime),
+        endDateTime: new Date(event.endDateTime),
+    } : eventDefaultValues
 
     const form = useForm<z.infer<typeof eventFormSchema>>({
         resolver: zodResolver(eventFormSchema),
         defaultValues: initalValues
     })
-    
+
     async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-        
+
         let uploadImageUrl = values.imageUrl
 
-        if(files.length > 0) {
+        if (files.length > 0) {
             const uploadImages = await startUpload(files)
-            if(!uploadImages){
+            if (!uploadImages) {
                 return
             }
             uploadImageUrl = uploadImages[0].url
         }
 
-        if( type === "Create"){
+        if (type === "Create") {
             try {
                 const newEvent = await createEvent({
-                    event:{...values, imageUrl: uploadImageUrl},
+                    event: { ...values, imageUrl: uploadImageUrl },
                     userId,
-                    path:"/profile"
+                    path: "/profile"
                 })
 
-                if(newEvent){
+                if (newEvent) {
                     form.reset()
                     router.push(`/events/${newEvent._id}`)
+                }
+            } catch (error) {
+                handleError(error)
+            }
+        }
+
+        if (type === "Update") {
+
+            if (!eventId) {
+                router.back()
+                return;
+            }
+
+            try {
+                const updatedEvent = await updateEvent({
+                    userId,
+                    event: {
+                        ...values,
+                        imageUrl: uploadImageUrl,
+                        _id: eventId
+                    },
+                    path: `/events/${eventId}`
+                })
+
+                if (updatedEvent) {
+                    form.reset()
+                    router.push(`/events/${updatedEvent._id}`)
                 }
             } catch (error) {
                 handleError(error)

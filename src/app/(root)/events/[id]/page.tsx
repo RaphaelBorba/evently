@@ -33,7 +33,7 @@ export default async function Page({ params: { id } }: SearchParamProps) {
                                 >
                                     {event.isFree ? "FREE" : `$${event.price}`}
                                 </p>
-                                <p className="p-medium-16 rounded-full bg-gray-500/10 px-4 py-2.5 text-gray-500">
+                                <p className="p-medium-16 max-w-[250px] truncate rounded-full bg-gray-500/10 px-4 py-2.5 text-gray-500">
                                     {event.category.name}
                                 </p>
                             </div>

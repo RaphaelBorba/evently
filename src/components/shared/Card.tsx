@@ -49,7 +49,7 @@ export default function Card({ event, hidePrice, hasOrderLink }: CardProps) {
                         <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-600">
                             {event.isFree ? "FREE" : `$${event.price}`}
                         </span>
-                        <p className="p-semibold-14 w-min rounded-full bg-gray-200 px-4 py-1 text-gray-500">
+                        <p className="p-semibold-14 w-min truncate rounded-full bg-gray-200 px-4 py-1 text-gray-500">
                             {event.category.name}
                         </p>
                     </div>
