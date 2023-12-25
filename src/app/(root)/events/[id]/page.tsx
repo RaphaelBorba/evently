@@ -1,3 +1,4 @@
+import CheckouButton from "@/components/shared/CheckoutButton";
 import Collection from "@/components/shared/Collection";
 import { getEventById, getRelatedEventsByCategory } from "@/lib/actions/event.actions";
 import { formatDateTime } from "@/lib/utils";
@@ -50,6 +51,8 @@ export default async function Page({ params: { id }, searchParams }: SearchParam
                             </div>
                         </div>
                         {/* CHECKOU BUTTON */}
+
+                        <CheckouButton event={event} />
 
                         <div className="flex flex-col gap-5">
                             <div className="flex gap-2 md:gap-3">
