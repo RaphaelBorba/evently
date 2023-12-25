@@ -3,15 +3,19 @@ import { Button } from "@/components/ui/button";
 import { getEventsByUser } from "@/lib/actions/event.actions";
 import { getOrdersByUser } from "@/lib/actions/order.actions";
 import { IOrder } from "@/lib/database/models/order.model";
+import { SearchParamProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 
 
 
-export default async function Page() {
+export default async function Page({searchParams}: SearchParamProps) {
 
     const {sessionClaims} = auth()
     const userId = sessionClaims?.userId as string
+
+    const ordersPage = Number(searchParams?.ordersPage) || 1
+    const eventsPage = Number(searchParams?.eventsPage) || 1
     
     const organizedEvents = await getEventsByUser({
         userId,
@@ -38,9 +42,9 @@ export default async function Page() {
                     emptyStateSubtext="No worries - plenty of exciting events to explore"
                     collectionType="My_Tickets"
                     limit={3}
-                    page={1}
+                    page={ordersPage}
                     urlParamName={"ordersPage"}
-                    totalPages={2}
+                    totalPages={orders?.totalPages}
                 />
             </section>
             <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
@@ -58,9 +62,9 @@ export default async function Page() {
                     emptyStateSubtext="Go create some now"
                     collectionType="Events_Organized"
                     limit={6}
-                    page={1}
+                    page={eventsPage}
                     urlParamName={"eventsPage"}
-                    totalPages={2}
+                    totalPages={organizedEvents?.totalPages}
                 />
             </section>
         </>

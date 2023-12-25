@@ -1,7 +1,6 @@
 import { IEvent } from "@/lib/database/models/event.model"
 import { formatDateTime } from "@/lib/utils"
 import { auth } from "@clerk/nextjs"
-import { ArrowUpRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import DeleteConfirmation from "./DeleteConfirmation"
@@ -67,7 +66,7 @@ export default function Card({ event, hidePrice, hasOrderLink }: CardProps) {
                     <p className="p-medium-14 md:p-medium-16 text-gray-600">
                         {event.organizer.firstName} {event.organizer.lastName}
                     </p>
-                    {!hasOrderLink && (
+                    {hasOrderLink && (
                         <Link href={`/orders?eventId=${event._id}`}
                             className="flex gap-2 hover:underline">
 

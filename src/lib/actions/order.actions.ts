@@ -96,6 +96,7 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
           _id: 1,
           totalAmount: 1,
           createdAt: 1,
+          buyerEmail:'$buyer.email',
           eventTitle: '$event.title',
           eventId: '$event._id',
           buyer: {
