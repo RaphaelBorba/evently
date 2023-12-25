@@ -1,15 +1,16 @@
 import { IEvent } from "@/lib/database/models/event.model";
 import Card from "./Card";
+import Pagination from "./Pagination";
 
 type CollectionProps = {
     data: IEvent[];
     emptyTitle: string;
     emptyStateSubtext: string;
-    collectionType: "Events_Organized" | "My_Tickets" | "All_Events";
     limit: number;
     page: number | string;
     totalPages?: number;
-    urlParamName?: string
+    urlParamName?: string;
+    collectionType?: "Events_Organized" | "My_Tickets" | "All_Events";
 }
 
 
@@ -42,6 +43,13 @@ export default function Collection({
                         )
                     })}
                 </ul>
+                {totalPages > 1 && (
+                    <Pagination
+                    urlParamName={urlParamName}
+                    page={page}
+                    totalPages={totalPages}
+                    />
+                )}
             </div>
         ):
         (
