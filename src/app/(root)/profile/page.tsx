@@ -61,7 +61,7 @@ export default async function Page({searchParams}: SearchParamProps) {
                     emptyTitle="No Events Have Been Created yet"
                     emptyStateSubtext="Go create some now"
                     collectionType="Events_Organized"
-                    limit={6}
+                    limit={3}
                     page={eventsPage}
                     urlParamName={"eventsPage"}
                     totalPages={organizedEvents?.totalPages}
